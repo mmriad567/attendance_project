@@ -1,0 +1,39 @@
+<div id="records-panel">
+    <div class="mb-3 flex items-center justify-between">
+        <p class="text-sm text-slate-500">
+            {{ records|length }} student{{ records|length|pluralize }} enrolled
+        </p>
+        {% if editable %}
+        <button hx-post="{% url 'attendance:mark_all_present' session.pk %}"
+                hx-target="#records-panel"
+                hx-swap="outerHTML"
+                class="rounded-md bg-green-600 px-3 py-1 text-sm text-white hover:bg-green-700">
+            Mark all present
+        </button>
+        {% endif %}
+    </div>
+
+    <div class="overflow-hidden rounded-lg bg-white shadow">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50 text-left text-slate-500">
+                <tr>
+                    <th class="px-4 py-2 font-medium">Roll</th>
+                    <th class="px-4 py-2 font-medium">Student</th>
+                    <th class="px-4 py-2 font-medium">Status</th>
+                    <th class="px-4 py-2 font-medium">Marked at</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for record in records %}
+                    {% include "attendance/partials/_student_row.html" %}
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="px-4 py-3 text-center text-slate-500">
+                        No students are enrolled in this subject.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

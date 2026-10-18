@@ -62,3 +62,11 @@ class HomeViewTests(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "accounts/dashboard.html")
         self.assertContains(response, "carol")
+
+    def test_teacher_is_redirected_to_attendance_dashboard(self):
+        teacher = User.objects.create_user(
+            username="teach", password="pw12345!", role=Role.TEACHER
+        )
+        self.client.force_login(teacher)
+        response = self.client.get(reverse("accounts:home"))
+        self.assertRedirects(response, reverse("attendance:dashboard"))

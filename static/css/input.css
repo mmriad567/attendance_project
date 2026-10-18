@@ -5,3 +5,8 @@
 @source "../../accounts";
 @source "../../academics";
 @source "../../core";
+@source "../../attendance";
+
+[x-cloak] {
+  display: none !important;
+}

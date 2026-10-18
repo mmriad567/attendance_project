@@ -1,0 +1,40 @@
+<div>
+    <h2 class="text-lg font-semibold text-slate-900">New class session</h2>
+    <p class="mb-4 text-sm text-slate-500">
+        {{ offering.subject.code }} · {{ offering.subject.name }} · {{ offering.session.name }}
+    </p>
+
+    {% if form.non_field_errors %}
+    <div class="mb-4 rounded-md border border-red-300 bg-red-50 px-4 py-2 text-sm text-red-700">
+        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+    </div>
+    {% endif %}
+
+    <form hx-post="{% url 'attendance:session_create' offering.pk %}"
+          hx-target="#session-modal-body"
+          hx-swap="innerHTML"
+          class="space-y-4">
+        {% csrf_token %}
+        {% for field in form %}
+        <div>
+            <label for="{{ field.id_for_label }}" class="mb-1 block text-sm font-medium text-slate-700">
+                {{ field.label }}
+            </label>
+            {{ field }}
+            {% for error in field.errors %}
+            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <div class="flex justify-end gap-2 pt-2">
+            <button type="button" @click="$dispatch('close-session-modal')"
+                    class="rounded-md border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-50">
+                Cancel
+            </button>
+            <button type="submit"
+                    class="rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700">
+                Start session
+            </button>
+        </div>
+    </form>
+</div>

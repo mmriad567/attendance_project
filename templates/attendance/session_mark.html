@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Mark attendance · {{ INSTITUTE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <a href="{% url 'attendance:dashboard' %}" class="text-sm text-indigo-600 hover:underline">
+        &larr; Back to dashboard
+    </a>
+    <h1 class="mt-2 text-2xl font-bold text-slate-900">
+        {{ session.offering.subject.code }} · {{ session.offering.subject.name }}
+    </h1>
+    <p class="text-sm text-slate-500">
+        {{ session.date }} · Period {{ session.period_no }} · {{ session.offering.session.name }}
+        {% if session.topic %} · {{ session.topic }}{% endif %}
+    </p>
+</div>
+
+{% if not editable %}
+<div class="mb-4 rounded-md border border-amber-300 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+    The editing window for this session has closed. Records are read-only.
+</div>
+{% endif %}
+
+{% include "attendance/partials/_records_table.html" %}
+{% endblock %}

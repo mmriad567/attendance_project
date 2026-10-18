@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
-from django.views.generic import TemplateView
+from django.shortcuts import redirect, render
+from django.views import View
 
 from .forms import LoginForm
 
@@ -13,7 +14,10 @@ class RoleLoginView(LoginView):
     redirect_authenticated_user = True
 
 
-class HomeView(LoginRequiredMixin, TemplateView):
-    """Entry point after login; role-specific dashboards replace this later."""
+class HomeView(LoginRequiredMixin, View):
+    """Send each role to its own landing page."""
 
-    template_name = "accounts/dashboard.html"
+    def get(self, request):
+        if request.user.is_teacher:
+            return redirect("attendance:dashboard")
+        return render(request, "accounts/dashboard.html")

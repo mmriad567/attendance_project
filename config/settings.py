@@ -19,6 +19,7 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost", cast=Csv(
 
 INSTITUTE_NAME = config("INSTITUTE_NAME", default="Polytechnic Institute")
 ATTENDANCE_THRESHOLD = config("ATTENDANCE_THRESHOLD", default=60, cast=int)
+ATTENDANCE_EDIT_WINDOW_DAYS = config("ATTENDANCE_EDIT_WINDOW_DAYS", default=3, cast=int)
 
 
 # Applications
@@ -33,6 +34,7 @@ INSTALLED_APPS = [
     "accounts",
     "core",
     "academics",
+    "attendance",
 ]
 
 MIDDLEWARE = [

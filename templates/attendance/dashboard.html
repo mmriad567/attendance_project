@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Dashboard · {{ INSTITUTE_NAME }}{% endblock %}
+
+{% block content %}
+<div x-data="{ open: false }"
+     @open-session-modal.window="open = true"
+     @close-session-modal.window="open = false">
+    <div class="mb-6 flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Teacher Dashboard</h1>
+            <p class="text-sm text-slate-500">Today is {{ today }}</p>
+        </div>
+    </div>
+
+    <section class="mb-8">
+        <h2 class="mb-3 text-lg font-semibold text-slate-800">Today's classes</h2>
+        {% if todays_sessions %}
+        <div class="overflow-hidden rounded-lg bg-white shadow">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+                <thead class="bg-slate-50 text-left text-slate-500">
+                    <tr>
+                        <th class="px-4 py-2 font-medium">Period</th>
+                        <th class="px-4 py-2 font-medium">Subject</th>
+                        <th class="px-4 py-2 font-medium">Progress</th>
+                        <th class="px-4 py-2"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for session in todays_sessions %}
+                    <tr>
+                        <td class="px-4 py-2">P{{ session.period_no }}</td>
+                        <td class="px-4 py-2">{{ session.offering.subject.code }} · {{ session.offering.subject.name }}</td>
+                        <td class="px-4 py-2">{{ session.present_count }} / {{ session.total_count }} present</td>
+                        <td class="px-4 py-2 text-right">
+                            <a href="{% url 'attendance:session_mark' session.pk %}"
+                               class="rounded-md bg-indigo-600 px-3 py-1 text-white hover:bg-indigo-700">
+                                Mark
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="rounded-lg bg-white px-4 py-3 text-sm text-slate-500 shadow">
+            No classes recorded for today yet.
+        </p>
+        {% endif %}
+    </section>
+
+    <section>
+        <h2 class="mb-3 text-lg font-semibold text-slate-800">Your subjects</h2>
+        {% if offerings %}
+        <div class="overflow-hidden rounded-lg bg-white shadow">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+                <thead class="bg-slate-50 text-left text-slate-500">
+                    <tr>
+                        <th class="px-4 py-2 font-medium">Code</th>
+                        <th class="px-4 py-2 font-medium">Subject</th>
+                        <th class="px-4 py-2 font-medium">Session</th>
+                        <th class="px-4 py-2 font-medium">Semester</th>
+                        <th class="px-4 py-2 font-medium">Section</th>
+                        <th class="px-4 py-2"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for offering in offerings %}
+                    <tr>
+                        <td class="px-4 py-2 font-mono">{{ offering.subject.code }}</td>
+                        <td class="px-4 py-2">{{ offering.subject.name }}</td>
+                        <td class="px-4 py-2">{{ offering.session.name }}</td>
+                        <td class="px-4 py-2">{{ offering.semester }}</td>
+                        <td class="px-4 py-2">{{ offering.section|default:"—" }}</td>
+                        <td class="px-4 py-2 text-right">
+                            <button hx-get="{% url 'attendance:session_create' offering.pk %}"
+                                    hx-target="#session-modal-body"
+                                    hx-swap="innerHTML"
+                                    @click="$dispatch('open-session-modal')"
+                                    class="rounded-md bg-slate-800 px-3 py-1 text-white hover:bg-slate-900">
+                                New session
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="rounded-lg bg-white px-4 py-3 text-sm text-slate-500 shadow">
+            You have no subjects assigned.
+        </p>
+        {% endif %}
+    </section>
+
+    <div x-show="open" x-cloak class="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/50 p-4">
+        <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl" @click.outside="$dispatch('close-session-modal')">
+            <div id="session-modal-body"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

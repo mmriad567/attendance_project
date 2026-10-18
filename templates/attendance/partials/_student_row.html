@@ -1,0 +1,21 @@
+<tr id="record-{{ record.student.pk }}">
+    <td class="px-4 py-2 font-mono">{{ record.student.roll_no }}</td>
+    <td class="px-4 py-2">{{ record.student.user.get_full_name|default:record.student.user.username }}</td>
+    <td class="px-4 py-2">
+        <div class="flex flex-wrap gap-1">
+            {% for value, label in statuses %}
+            <button hx-post="{% url 'attendance:record_set' session.pk record.student.pk %}"
+                    hx-vals='{"status": "{{ value }}"}'
+                    hx-target="#record-{{ record.student.pk }}"
+                    hx-swap="outerHTML"
+                    {% if not editable %}disabled{% endif %}
+                    class="rounded border px-2 py-1 text-xs font-medium {% if record.status == value %}{% if value == 'present' %}border-green-600 bg-green-600 text-white{% elif value == 'absent' %}border-red-600 bg-red-600 text-white{% elif value == 'late' %}border-amber-500 bg-amber-500 text-white{% else %}border-slate-600 bg-slate-600 text-white{% endif %}{% else %}border-slate-300 bg-white text-slate-600 hover:bg-slate-50{% endif %}">
+                {{ label }}
+            </button>
+            {% endfor %}
+        </div>
+    </td>
+    <td class="px-4 py-2 text-xs text-slate-400">
+        {% if record.marked_at %}{{ record.marked_at|date:"d M, H:i" }}{% else %}—{% endif %}
+    </td>
+</tr>

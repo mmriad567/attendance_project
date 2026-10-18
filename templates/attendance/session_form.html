@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}New session · {{ INSTITUTE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-lg rounded-lg bg-white p-6 shadow">
+    {% include "attendance/partials/_session_form.html" %}
+</div>
+{% endblock %}
