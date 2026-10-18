@@ -1,0 +1,4 @@
+Django==6.1.2
+python-decouple==3.8
+Pillow==13.0.0
+reportlab==5.0.1
