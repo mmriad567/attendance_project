@@ -20,4 +20,6 @@ class HomeView(LoginRequiredMixin, View):
     def get(self, request):
         if request.user.is_teacher:
             return redirect("attendance:dashboard")
+        if request.user.is_student:
+            return redirect("students:dashboard")
         return render(request, "accounts/dashboard.html")

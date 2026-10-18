@@ -15,9 +15,19 @@
     {% if user.is_authenticated %}
     <nav class="bg-indigo-700 text-white">
         <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-            <a href="{% url 'accounts:home' %}" class="text-lg font-semibold tracking-tight">
-                {{ INSTITUTE_NAME }}
-            </a>
+            <div class="flex items-center gap-4">
+                <a href="{% url 'accounts:home' %}" class="text-lg font-semibold tracking-tight">
+                    {{ INSTITUTE_NAME }}
+                </a>
+                {% if user.is_teacher %}
+                <a href="{% url 'attendance:dashboard' %}" class="text-sm text-indigo-100 hover:text-white">Attendance</a>
+                {% elif user.is_student %}
+                <a href="{% url 'students:dashboard' %}" class="text-sm text-indigo-100 hover:text-white">My attendance</a>
+                <a href="{% url 'students:history' %}" class="text-sm text-indigo-100 hover:text-white">History</a>
+                {% elif user.is_admin %}
+                <a href="/admin/" class="text-sm text-indigo-100 hover:text-white">Admin</a>
+                {% endif %}
+            </div>
             <div class="flex items-center gap-4 text-sm">
                 <span class="rounded-full bg-indigo-500 px-3 py-1 font-medium capitalize">
                     {{ user.get_role_display }}

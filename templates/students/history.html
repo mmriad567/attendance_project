@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance history · {{ INSTITUTE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <a href="{% url 'students:dashboard' %}" class="text-sm text-indigo-600 hover:underline">
+            &larr; Back to dashboard
+        </a>
+        <h1 class="mt-2 text-2xl font-bold text-slate-900">Attendance history</h1>
+    </div>
+</div>
+
+<form method="get" class="mb-4 flex flex-wrap items-end gap-3">
+    <div>
+        <label for="offering" class="mb-1 block text-sm font-medium text-slate-700">Subject</label>
+        <select name="offering" id="offering"
+                class="rounded-md border border-slate-300 px-3 py-2 text-sm">
+            <option value="">All subjects</option>
+            {% for enrollment in offerings %}
+            <option value="{{ enrollment.offering.pk }}"
+                    {% if filters.offering == enrollment.offering.pk|stringformat:"s" %}selected{% endif %}>
+                {{ enrollment.offering.subject.code }} · {{ enrollment.offering.subject.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label for="status" class="mb-1 block text-sm font-medium text-slate-700">Status</label>
+        <select name="status" id="status"
+                class="rounded-md border border-slate-300 px-3 py-2 text-sm">
+            <option value="">All statuses</option>
+            {% for value, label in statuses %}
+            <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="rounded-md bg-slate-800 px-4 py-2 text-sm text-white hover:bg-slate-900">
+        Filter
+    </button>
+</form>
+
+<div class="overflow-hidden rounded-lg bg-white shadow">
+    <table class="min-w-full divide-y divide-slate-200 text-sm">
+        <thead class="bg-slate-50 text-left text-slate-500">
+            <tr>
+                <th class="px-4 py-2 font-medium">Date</th>
+                <th class="px-4 py-2 font-medium">Period</th>
+                <th class="px-4 py-2 font-medium">Subject</th>
+                <th class="px-4 py-2 font-medium">Status</th>
+                <th class="px-4 py-2 font-medium">Remark</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+            {% for record in records %}
+            <tr>
+                <td class="px-4 py-2">{{ record.class_session.date }}</td>
+                <td class="px-4 py-2">P{{ record.class_session.period_no }}</td>
+                <td class="px-4 py-2">
+                    {{ record.class_session.offering.subject.code }} · {{ record.class_session.offering.subject.name }}
+                </td>
+                <td class="px-4 py-2">
+                    <span class="rounded-full px-2 py-0.5 text-xs font-medium {% if record.status == 'present' %}bg-green-100 text-green-700{% elif record.status == 'late' %}bg-amber-100 text-amber-700{% elif record.status == 'absent' %}bg-red-100 text-red-700{% else %}bg-slate-200 text-slate-700{% endif %}">
+                        {{ record.get_status_display }}
+                    </span>
+                </td>
+                <td class="px-4 py-2 text-slate-500">{{ record.remark|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="px-4 py-3 text-center text-slate-500">
+                    No attendance records found.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if is_paginated %}
+<div class="mt-4 flex items-center justify-between text-sm">
+    <span class="text-slate-500">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+    <div class="flex gap-2">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if filters.offering %}&offering={{ filters.offering }}{% endif %}{% if filters.status %}&status={{ filters.status }}{% endif %}"
+           class="rounded-md border border-slate-300 px-3 py-1 hover:bg-slate-50">Previous</a>
+        {% endif %}
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if filters.offering %}&offering={{ filters.offering }}{% endif %}{% if filters.status %}&status={{ filters.status }}{% endif %}"
+           class="rounded-md border border-slate-300 px-3 py-1 hover:bg-slate-50">Next</a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

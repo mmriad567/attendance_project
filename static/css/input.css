@@ -6,6 +6,7 @@
 @source "../../academics";
 @source "../../core";
 @source "../../attendance";
+@source "../../students";
 
 [x-cloak] {
   display: none !important;

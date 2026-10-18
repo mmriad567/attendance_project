@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}My attendance · {{ INSTITUTE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900">
+        Hello, {{ user.get_full_name|default:user.username }}
+    </h1>
+    <p class="text-sm text-slate-500">
+        {{ summary.student.roll_no }} · {{ summary.student.department.code }} ·
+        Semester {{ summary.student.current_semester }}
+    </p>
+</div>
+
+{% if summary.below_threshold %}
+<div class="mb-6 rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
+    <p class="font-semibold">Low attendance warning</p>
+    <p>Your overall attendance is below the required {{ summary.threshold }}%.</p>
+</div>
+{% endif %}
+
+<div class="mb-8 grid gap-4 sm:grid-cols-3">
+    <div class="rounded-lg bg-white p-5 shadow">
+        <p class="text-sm text-slate-500">Overall attendance</p>
+        {% if summary.percentage is not None %}
+        <p class="mt-1 text-3xl font-bold {% if summary.below_threshold %}text-red-600{% else %}text-green-600{% endif %}">
+            {{ summary.percentage }}%
+        </p>
+        {% else %}
+        <p class="mt-1 text-3xl font-bold text-slate-400">—</p>
+        {% endif %}
+    </div>
+    <div class="rounded-lg bg-white p-5 shadow">
+        <p class="text-sm text-slate-500">Classes attended</p>
+        <p class="mt-1 text-3xl font-bold text-slate-800">{{ summary.attended }}</p>
+    </div>
+    <div class="rounded-lg bg-white p-5 shadow">
+        <p class="text-sm text-slate-500">Classes held</p>
+        <p class="mt-1 text-3xl font-bold text-slate-800">{{ summary.total }}</p>
+    </div>
+</div>
+
+<h2 class="mb-3 text-lg font-semibold text-slate-800">By subject</h2>
+<div class="overflow-hidden rounded-lg bg-white shadow">
+    <table class="min-w-full divide-y divide-slate-200 text-sm">
+        <thead class="bg-slate-50 text-left text-slate-500">
+            <tr>
+                <th class="px-4 py-2 font-medium">Code</th>
+                <th class="px-4 py-2 font-medium">Subject</th>
+                <th class="px-4 py-2 font-medium">Present</th>
+                <th class="px-4 py-2 font-medium">Late</th>
+                <th class="px-4 py-2 font-medium">Absent</th>
+                <th class="px-4 py-2 font-medium">Total</th>
+                <th class="px-4 py-2 font-medium">Attendance</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+            {% for row in summary.rows %}
+            <tr>
+                <td class="px-4 py-2 font-mono">{{ row.offering.subject.code }}</td>
+                <td class="px-4 py-2">{{ row.offering.subject.name }}</td>
+                <td class="px-4 py-2">{{ row.present }}</td>
+                <td class="px-4 py-2">{{ row.late }}</td>
+                <td class="px-4 py-2">{{ row.absent }}</td>
+                <td class="px-4 py-2">{{ row.total }}</td>
+                <td class="px-4 py-2">
+                    {% if row.percentage is not None %}
+                    <span class="rounded-full px-2 py-0.5 text-xs font-medium {% if row.below_threshold %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                        {{ row.percentage }}%
+                    </span>
+                    {% else %}
+                    <span class="text-xs text-slate-400">No classes yet</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="px-4 py-3 text-center text-slate-500">
+                    You are not enrolled in any subject.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-6">
+    <a href="{% url 'students:history' %}"
+       class="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700">
+        View full history
+    </a>
+</div>
+{% endblock %}
