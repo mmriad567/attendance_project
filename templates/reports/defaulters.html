@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Defaulters · {{ offering.subject.code }}{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <a href="{% url 'reports:offering_report' offering.pk %}" class="text-sm text-indigo-600 hover:underline">
+        &larr; Back to report
+    </a>
+    <h1 class="mt-2 text-2xl font-bold text-slate-900">Defaulter list</h1>
+    <p class="text-sm text-slate-500">
+        {{ offering.subject.code }} · {{ offering.subject.name }} · below {{ ATTENDANCE_THRESHOLD }}%
+    </p>
+</div>
+
+<div class="overflow-hidden rounded-lg bg-white shadow">
+    <table class="min-w-full divide-y divide-slate-200 text-sm">
+        <thead class="bg-slate-50 text-left text-slate-500">
+            <tr>
+                <th class="px-4 py-2 font-medium">Roll</th>
+                <th class="px-4 py-2 font-medium">Name</th>
+                <th class="px-4 py-2 font-medium">Attended</th>
+                <th class="px-4 py-2 font-medium">Total</th>
+                <th class="px-4 py-2 font-medium">Attendance</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+            {% for row in defaulters %}
+            <tr>
+                <td class="px-4 py-2 font-mono">{{ row.student.roll_no }}</td>
+                <td class="px-4 py-2">{{ row.student.user.get_full_name|default:row.student.user.username }}</td>
+                <td class="px-4 py-2">{{ row.attended }}</td>
+                <td class="px-4 py-2">{{ row.total }}</td>
+                <td class="px-4 py-2">
+                    <span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                        {{ row.percentage }}%
+                    </span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="px-4 py-3 text-center text-slate-500">
+                    No defaulters — everyone is above the threshold.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -41,3 +41,14 @@ class SeedDemoCommandTests(BaseTestCase):
         profile = StudentProfile.objects.select_related("user").first()
         self.assertEqual(profile.user.role, "student")
         self.assertTrue(profile.user.check_password("demo12345"))
+
+    def test_seed_creates_superuser_admin(self):
+        from django.contrib.auth import get_user_model
+
+        call_command("seed_demo", verbosity=0)
+
+        admin = get_user_model().objects.get(username="admin")
+        self.assertTrue(admin.is_superuser)
+        self.assertTrue(admin.is_staff)
+        self.assertEqual(admin.role, "admin")
+        self.assertTrue(admin.check_password("demo12345"))

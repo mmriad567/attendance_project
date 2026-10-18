@@ -80,6 +80,16 @@ class Command(BaseCommand):
         ]:
             SystemSetting.set(key, value, desc)
 
+        admin, _ = User.objects.get_or_create(
+            username="admin",
+            defaults={"role": Role.ADMIN, "first_name": "System", "last_name": "Admin"},
+        )
+        admin.role = Role.ADMIN
+        admin.is_staff = True
+        admin.is_superuser = True
+        admin.set_password(DEMO_PASSWORD)
+        admin.save()
+
         departments = {}
         for data in DEPARTMENTS:
             dept, _ = Department.objects.get_or_create(

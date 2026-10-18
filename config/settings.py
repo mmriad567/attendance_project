@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     "academics",
     "attendance",
     "students",
+    "reports",
+    "notifications",
 ]
 
 MIDDLEWARE = [
@@ -61,6 +63,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "config.context_processors.site_settings",
+                "notifications.context_processors.notifications",
             ],
         },
     },
@@ -113,6 +116,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # Email
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="no-reply@attendance.local")
+
 MAILERS = {
     "default": {
         "BACKEND": config(

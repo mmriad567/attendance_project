@@ -95,3 +95,66 @@ def student_summary(student, threshold=None):
         "below_threshold": percentage is not None and percentage < threshold,
         "low_offerings": [row for row in rows if row["below_threshold"]],
     }
+
+
+def offering_student_rows(offering, threshold=None):
+    """Per-student attendance breakdown for one offering."""
+    if threshold is None:
+        threshold = getattr(settings, "ATTENDANCE_THRESHOLD", 60)
+
+    enrollments = (
+        offering.enrollments.filter(is_active=True)
+        .select_related("student__user")
+        .order_by("student__roll_no")
+    )
+
+    rows = []
+    for enrollment in enrollments:
+        stats = offering_stats(enrollment.student, offering, threshold)
+        rows.append(
+            {
+                "student": enrollment.student,
+                "total": stats["total"],
+                "present": stats["present"],
+                "late": stats["late"],
+                "absent": stats["absent"],
+                "excused": stats["excused"],
+                "attended": stats["attended"],
+                "percentage": stats["percentage"],
+                "below_threshold": stats["below_threshold"],
+            }
+        )
+    return rows
+
+
+def offering_status_distribution(offering):
+    """Total count of each status across all sessions of an offering."""
+    records = AttendanceRecord.objects.filter(class_session__offering=offering)
+    return {
+        status.value: records.filter(status=status.value).count()
+        for status in AttendanceStatus
+    }
+
+
+def offering_trends(offering):
+    """Attendance percentage for each session (oldest first), for charts."""
+    sessions = (
+        ClassSession.objects.filter(offering=offering)
+        .order_by("date", "period_no")
+        .prefetch_related("records")
+    )
+    trends = []
+    for session in sessions:
+        total = session.records.count()
+        if not total:
+            continue
+        attended = session.records.filter(
+            status__in=[s.value for s in ATTENDED_STATUSES]
+        ).count()
+        trends.append(
+            {
+                "label": f"{session.date:%d %b} P{session.period_no}",
+                "percentage": round(attended / total * 100, 1),
+            }
+        )
+    return trends

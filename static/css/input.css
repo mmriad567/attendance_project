@@ -7,6 +7,8 @@
 @source "../../core";
 @source "../../attendance";
 @source "../../students";
+@source "../../reports";
+@source "../../notifications";
 
 [x-cloak] {
   display: none !important;
